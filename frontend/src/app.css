@@ -1,0 +1,157 @@
+/* BASE STYLES + BP */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { background-color: #ffffff; }
+body {
+    font-family: "Times New Roman", Times, serif;
+    line-height: 1.5;
+    color: #5a5a5a;
+    background-color: #ffffff;
+    max-width: 1230px;
+    margin: 0 auto;
+    padding: 0;
+}
+@media screen and (max-width: 1230px) {
+    body { padding: 0 25px; }
+}
+
+/* TYPOGRAPHY FOR THE NYT STYLING */
+h1, h2, h3 {
+    font-family: Georgia, serif;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: #000;
+}
+h1 { font-size: 2.5rem; }
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.2rem; }
+p {
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    font-family: Georgia, serif;
+}
+
+/* HEADER STYLING */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+    border-bottom: 1px solid #e2e2e2;
+    margin-bottom: 20px;
+    position: relative;
+}
+.date-container {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    position: absolute;
+    left: 0;
+    top: 20px;
+}
+.date { font-size: 0.9rem; color: #000; font-weight: bold; }
+.sub-date { font-size: 0.85rem; color: #666; }
+.logo { max-width: 400px; height: auto; margin: 0 auto; display: block; }
+
+/* LAYOUT FOR THE MAIN CONTENT */
+main {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 20px 0;
+
+    row-gap: 20px; /* vertical spacing between the rows */
+}
+.column {
+    padding: 0 15px; /* horizontal padding on page*/
+    margin-bottom: 0; /* row-gap for vertical spacing */
+    padding-top: 0;
+    position: relative; /* positioning context */
+}
+
+
+/* ARTICLE STYLING AND IMAGE*/
+article { margin-bottom: 20px; }
+article img {
+    width: 100%;
+    height: auto;
+    margin-bottom: 10px;
+    object-fit: cover;
+}
+.read-time {
+    font-family: "Cheyenne Sans Medium", Arial, sans-serif;
+    font-size: 0.7rem;
+    color: #727272;
+    margin: 0.5rem 0;
+    text-transform: uppercase;
+}
+
+/* HORIZONTAL DIVIDER */
+.divider-horizontal { border-bottom: 1px solid #e2e2e2; margin: 10px 0 15px; width: 100%; }
+
+/* FOOTER STYLING */
+footer { padding: 20px 0; color: #666; font-size: 0.9rem; font-family: Arial, sans-serif; text-align: center; }
+.footer-divider { border-bottom: 3px solid #000; margin: 10px auto 15px; width: 90%; }
+
+/* RESPONSIVE LAYOUTS */
+
+/* DESKTOP VIEW (resolution >1024px): 3 COLUMNS */
+@media (min-width: 1025px) {
+    .column {
+        width: 33.333%;
+        padding-top: 0; /* reset padding-top */
+        margin-bottom: 0; /* use row-gap for the vertical spacing */
+    }
+    /* vertical divider on all columns except the last one */
+    .column:not(:last-child) {
+         border-right: 1px solid #e2e2e2;
+    }
+}
+
+/* header stacking on mobile */
+@media screen and (max-width: 950px) {
+    header { flex-direction: column; align-items: flex-start; }
+    .date-container { position: static; margin-top: 15px; width: 100%; order: 2; }
+    .logo { margin: 0 auto; order: 1; }
+}
+
+/* TABLET VIEW (resolution 768px-1024px): 2 COLUMNS */
+@media (min-width: 768px) and (max-width: 1024px) {
+    body { padding: 0 25px; }
+    .column {
+        width: 50%;
+        border: none; /* reset all borders first */
+        padding: 20px 15px 0 15px; 
+    }
+    /* vertical divider on the fist column of each row */
+    .column:nth-child(odd) {
+        border-right: 1px solid #e2e2e2;
+    }
+    /* horizontal divider for the third column */
+    .column:nth-child(3) {
+        position: relative;
+    }
+    .column:nth-child(3)::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 15px;
+        right: 15px;
+        height: 1px;
+        background-color: #e2e2e2;
+    }
+}
+
+/* MOBILE VIEW (resolution <768px): 1 COLUMN */
+@media (max-width: 767px) {
+    body { padding: 0 25px; }
+     header { align-items: center; }
+     .logo { max-width: 250px; }
+     .date-container { text-align: left; }
+
+    .column {
+         width: 100%;
+         border: none; /* reset th e borders */
+         padding: 20px 15px 0 15px; /* consistent padding */
+    }
+    /* horizontal divider above all columns except for the first one */
+    .column:not(:first-child) {
+        border-top: 1px solid #e2e2e2;
+    }
+}
