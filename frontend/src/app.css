@@ -137,6 +137,35 @@ footer { padding: 20px 0; color: #666; font-size: 0.9rem; font-family: Arial, sa
     cursor: pointer;
   }
   
+  /* app.css */
+.comments-sidebar {
+    width: 410px;    /* a little wider for comments */
+  }
+  
+  /* Inputs & comment list styling */
+  .comments-sidebar .sidebar-content input[type="text"] {
+    width: 100%;
+    padding: .5rem;
+    margin: .75rem 0;
+  }
+  .comments-sidebar .btn-group {
+    display: flex;
+    justify-content: flex-end;
+    gap: .5rem;
+  }
+  .comments-sidebar .comment {
+    padding: .75rem 0;
+    border-bottom: 1px solid #eee;
+  }
+  .comments-sidebar .comment p {
+    margin: .25rem 0;
+    line-height: 1.4;
+  }
+  .comments-sidebar .comment small {
+    color: #666;
+    font-size: .8rem;
+  }
+  
 
 /* RESPONSIVE LAYOUTS */
 

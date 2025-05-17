@@ -2,10 +2,13 @@
 from dotenv import load_dotenv
 import os
 from flask import Flask, jsonify, send_from_directory, redirect, session, request
+import requests
 from flask_cors import CORS
 from pymongo import MongoClient
 from authlib.integrations.flask_client import OAuth
 from authlib.common.security import generate_token
+from bson import ObjectId
+from datetime import datetime
 
 # ─── Load environment variables ────────────────────────────────────────────────
 load_dotenv()
@@ -13,9 +16,16 @@ load_dotenv()
 # ─── App & Middleware ─────────────────────────────────────────────────────────
 app = Flask(__name__, static_folder="static", template_folder="templates")
 app.secret_key = os.urandom(24)
+# allow only your dev frontend to use credentials
+from flask_cors import CORS
+CORS(
+    app,
+    supports_credentials=True,
+    resources={r"/api/*": {"origins": "http://localhost:5173"}}
+)
 # CORS(app)
 # allow the browser to send and receive cookies
-CORS(app, supports_credentials=True)
+# CORS(app, supports_credentials=True)
 
 
 # ─── OIDC / Dex Setup ─────────────────────────────────────────────────────────
@@ -58,6 +68,30 @@ def get_user():
         return {}, 401
     return jsonify(user)
 
+@app.route("/api/search")
+def search_articles():
+    """Proxy NYT article search through our backend."""
+    q = request.args.get("q", "").strip()
+    if not q:
+        return jsonify({"error": "Missing ‘q’ parameter"}), 400
+
+    # pull your key from env
+    api_key = os.getenv("NYT_API_KEY")
+    resp = requests.get(
+        "https://api.nytimes.com/svc/search/v2/articlesearch.json",
+        params={"q": q, "api-key": api_key},
+        timeout=5
+    )
+
+    if resp.status_code != 200:
+        return jsonify({
+            "error": "NYT API error",
+            "status": resp.status_code,
+            "detail": resp.text[:200]
+        }), resp.status_code
+
+    return jsonify(resp.json())
+
 @app.route("/api/comments", methods=["GET"])
 def list_comments():
     """Return all comments."""
@@ -70,6 +104,73 @@ def add_comment():
     data = request.get_json()
     result = comments.insert_one(data)
     return jsonify({"inserted_id": str(result.inserted_id)}), 201
+
+# ─── NEW: Get all comments for one article ────────────────────────────────────
+@app.route("/api/comments/<path:article_id>", methods=["GET"])
+def get_comments(article_id):
+    """Return all comments for a single article, sorted oldest→newest."""
+    # no ObjectId conversion—just use the raw string key
+    docs = list(
+        comments.find(
+        {"articleId": article_id},
+        {"_id": 1, "user": 1, "text": 1, "createdAt": 1}
+        ).sort("createdAt", 1)
+    )
+
+    # try:
+    #     oid = ObjectId(article_id)
+    # except:
+    #     return jsonify({"error": "Invalid article_id"}), 400
+
+    # docs = list(
+    #     comments.find(
+    #         {"articleId": oid},
+    #         {"_id": 1, "user": 1, "text": 1, "createdAt": 1}
+    #     ).sort("createdAt", 1)
+    # )
+
+    # convert to JSON-serializable
+    for d in docs:
+        d["id"] = str(d.pop("_id"))
+        d["createdAt"] = d["createdAt"].isoformat()
+    return jsonify(docs)
+
+# ─── NEW: Post a new comment to an article ────────────────────────────────────
+@app.route("/api/comments/<path:article_id>", methods=["POST"])
+def post_comment(article_id):
+    """
+    Body: { text: string }
+    Requires authenticated user (session['user']).
+    """
+    user = session.get("user")
+    if not user:
+        return jsonify({"error": "Authentication required"}), 401
+
+    body = request.get_json() or {}
+    text = body.get("text", "").strip()
+    if not text:
+        return jsonify({"error": "Empty comment"}), 400
+
+    # try:
+    #     oid = ObjectId(article_id)
+    # except:
+    #     return jsonify({"error": "Invalid article_id"}), 400
+
+    doc = {
+        # "articleId": oid,
+        # store the raw string ID
+        "articleId": article_id,
+        "user": user["email"],
+        "text": text,
+        "createdAt": datetime.utcnow()
+    }
+    res = comments.insert_one(doc)
+    return jsonify({
+        "id": str(res.inserted_id),
+        "user": doc["user"],
+        "text": doc["text"],
+        "createdAt": doc["createdAt"].isoformat()
+    }), 201
 
 # ─── AUTH ROUTES ───────────────────────────────────────────────────────────────
 @app.route("/login")
