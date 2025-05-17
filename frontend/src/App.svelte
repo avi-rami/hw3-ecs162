@@ -5,6 +5,10 @@
   // state
   let apiKey: string = ''
   let articles: any[] = []
+  // let user: any = null      // ← new: track logged-in user
+  // ← NEW: track logged-in user and sidebar visibility
+  let user: { email: string } | null = null
+  let showSidebar = false
 
   // nytimes api
   const BASE_URL =
@@ -71,6 +75,17 @@
 
   // page setup on first mount
   onMount(async () => {
+    // ─── New: see if we're already logged in ────────────────────────────────
+    try {
+      const userRes = await fetch('/api/user', { credentials: 'include' })
+      if (userRes.ok) {
+        user = await userRes.json()
+        console.log('Logged in user:', user)
+      }
+    } catch (err) {
+      console.error('Failed to fetch session user', err)
+    }
+    
     try {
       const res = await fetch('/api/key')
       const data = await res.json()
@@ -112,7 +127,48 @@
     src="/assets/images/The-New-York-Times-Logo 1.png"
     alt="the new york times logo"
     class="logo" />
+
+  {#if !user}
+    <!-- ← original Log In when no session -->
+    <button
+      class="login-button"
+      on:click={() => (location.href = '/login')}>
+      Log In
+    </button>
+  {:else}
+    <!-- ← Account trigger once logged in -->
+    <button
+      class="login-button"
+      on:click={() => (showSidebar = true)}>
+      Account ▾
+    </button>
+  {/if}
 </header>
+
+{#if showSidebar}
+  <!-- ← sidebar panel -->
+  <aside class="account-sidebar">
+    <header>
+      <strong>{user?.email}</strong>
+      <button class="close-btn" on:click={() => (showSidebar = false)}>
+        ✕
+      </button>
+    </header>
+
+    <div class="account-content">
+      <!-- you can customize this area -->
+      <p>Good afternoon.</p>
+    </div>
+
+    <footer>
+      <button
+        class="logout-btn"
+        on:click={() => (location.href = '/logout')}>
+        Log Out
+      </button>
+    </footer>
+  </aside>
+{/if}
 
 <!-- main: three-column layout -->
 <main>

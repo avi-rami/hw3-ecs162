@@ -13,7 +13,10 @@ load_dotenv()
 # ─── App & Middleware ─────────────────────────────────────────────────────────
 app = Flask(__name__, static_folder="static", template_folder="templates")
 app.secret_key = os.urandom(24)
-CORS(app)
+# CORS(app)
+# allow the browser to send and receive cookies
+CORS(app, supports_credentials=True)
+
 
 # ─── OIDC / Dex Setup ─────────────────────────────────────────────────────────
 oauth = OAuth(app)
@@ -23,7 +26,7 @@ oauth.register(
     name=os.getenv("OIDC_CLIENT_NAME"),
     client_id=os.getenv("OIDC_CLIENT_ID"),
     client_secret=os.getenv("OIDC_CLIENT_SECRET"),
-    authorization_endpoint="http://dex:5556/auth",
+    authorization_endpoint="http://localhost:5556/auth",
     token_endpoint="http://dex:5556/token",
     jwks_uri="http://dex:5556/keys",
     userinfo_endpoint="http://dex:5556/userinfo",
@@ -48,13 +51,20 @@ def get_key():
     """Expose the NYT API key to the frontend."""
     return jsonify({"apiKey": os.getenv("NYT_API_KEY")})
 
+@app.route("/api/user")
+def get_user():
+    user = session.get("user")
+    if not user:
+        return {}, 401
+    return jsonify(user)
+
 @app.route("/api/comments", methods=["GET"])
 def list_comments():
     """Return all comments."""
     docs = list(comments.find({}, {"_id": 0}))
     return jsonify(docs)
 
-@app.route("/api/comments", methods=["POST"])
+@app.route("/api/comments", methods=["POST"])  # new code
 def add_comment():
     """Add a new comment."""
     data = request.get_json()
@@ -66,14 +76,20 @@ def add_comment():
 def login():
     session["nonce"] = nonce
     redirect_uri = "http://localhost:8000/authorize"
-    return oauth.flask_app.authorize_redirect(redirect_uri, nonce=nonce)
+    # return oauth.flask_app.authorize_redirect(redirect_uri, nonce=nonce)
+    client = oauth.create_client(os.getenv("OIDC_CLIENT_NAME"))
+    return client.authorize_redirect(redirect_uri, nonce=nonce)
 
 @app.route("/authorize")
 def authorize():
-    token = oauth.flask_app.authorize_access_token()
-    user_info = oauth.flask_app.parse_id_token(token, nonce=session.get("nonce"))
+    # token = oauth.flask_app.authorize_access_token()
+    # user_info = oauth.flask_app.parse_id_token(token, nonce=session.get("nonce"))
+    client = oauth.create_client(os.getenv("OIDC_CLIENT_NAME"))
+    token = client.authorize_access_token()
+    user_info = client.parse_id_token(token, nonce=session.get("nonce"))
     session["user"] = user_info
-    return redirect("/")
+    # return redirect("/")
+    return redirect("http://localhost:5173/")
 
 @app.route("/logout")
 def logout():
@@ -98,6 +114,7 @@ def serve_frontend(path):
     if os.path.exists(full_path):
         return send_from_directory(app.static_folder, path)
     return send_from_directory(app.template_folder, "index.html")
+
 
 # ─── RUN ───────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":

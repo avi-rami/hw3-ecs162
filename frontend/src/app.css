@@ -89,6 +89,55 @@ article img {
 footer { padding: 20px 0; color: #666; font-size: 0.9rem; font-family: Arial, sans-serif; text-align: center; }
 .footer-divider { border-bottom: 3px solid #000; margin: 10px auto 15px; width: 90%; }
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   Sidebar container: fixed to the right, full height, off-canvas by default
+───────────────────────────────────────────────────────────────────────────── */
+.account-sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 300px;           /* adjust as needed */
+    height: 100vh;
+    background: white;
+    box-shadow: -4px 0 16px rgba(0,0,0,0.2);
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    z-index: 100;           /* above the page */
+  }
+  
+  /* Close “X” button in the header */
+  .account-sidebar .close-btn {
+    margin-left: auto;
+    background: transparent;
+    border: none;
+    font-size: 1.25rem;
+    cursor: pointer;
+  }
+  
+  /* Content grows to fill available space */
+  .account-sidebar .account-content {
+    flex: 1;
+    overflow-y: auto;
+    margin: 1rem 0;
+  }
+  
+  /* Footer sticks to bottom */
+  .account-sidebar footer {
+    margin-top: auto;
+    text-align: center;
+  }
+  
+  /* Log Out button styling */
+  .account-sidebar .logout-btn {
+    background: none;
+    border: none;
+    color: #333;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+
 /* RESPONSIVE LAYOUTS */
 
 /* DESKTOP VIEW (resolution >1024px): 3 COLUMNS */

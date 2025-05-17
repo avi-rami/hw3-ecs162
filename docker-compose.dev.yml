@@ -25,9 +25,18 @@ services:
     depends_on:
       - mongo
       - dex
-    command: sh -c "pip install --no-cache-dir -r requirements.txt && python -m flask run --host=0.0.0.0 --port=\$PORT --reload --debug"
+    # explicitly set Flask host/port and enable debug/autoreload
     environment:
-      FLASK_APP: app.py
+      - FLASK_APP=app.py
+      - FLASK_ENV=development
+      - FLASK_RUN_HOST=0.0.0.0
+      - FLASK_RUN_PORT=${PORT}
+    # install & run via flask CLI
+    command: >
+      sh -c "
+        pip install --no-cache-dir -r requirements.txt &&
+        flask run
+      "
 
   mongo:
     image: mongo:6
