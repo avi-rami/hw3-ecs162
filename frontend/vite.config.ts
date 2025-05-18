@@ -40,6 +40,10 @@ export default defineConfig(({ mode }) => ({
       },
     },
   } : undefined,
+  test: {
+    environment: 'jsdom',
+    globals: true
+  },
 }))
 
 
@@ -97,7 +101,7 @@ export default defineConfig(({ mode }) => ({
 //         target: 'http://localhost:8000',
 //         changeOrigin: true,
 //         secure: false,
-//         // rewrite the cookie’s domain so your browser accepts it on localhost
+//         // rewrite the cookie's domain so your browser accepts it on localhost
 //         cookieDomainRewrite: 'localhost',
 //         configure: (proxy, options) => {
 //           proxy.on('proxyReq', (proxyReq, req, res) => {
