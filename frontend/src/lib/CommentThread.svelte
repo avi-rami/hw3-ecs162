@@ -139,6 +139,7 @@
         <CommentThread
           {articleId}
           comment={reply}
+          user={user}
           on:reply={(e) => dispatch('reply', e.detail)}
         />
       {/each}
