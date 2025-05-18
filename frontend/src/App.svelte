@@ -17,7 +17,7 @@
   /** Fired when CommentsSidebar dispatches `updateCount` */
   function handleUpdateCount(event) {
     const { articleId, count } = event.detail;
-    // immutably update only that one article’s commentCount
+    // immutably update only that one article's commentCount
     articles = articles.map((a) =>
       a._id === articleId ? { ...a, commentCount: count } : a
     );
@@ -236,6 +236,7 @@
     <CommentsSidebar
       articleId={currentArticle.id}
       title={currentArticle.title}
+      user={user}
       on:close={() => (showCommentsPanel = false)}
       on:updateCount={handleUpdateCount}
     />

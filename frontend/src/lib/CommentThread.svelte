@@ -9,8 +9,10 @@
     createdAt: string;
     parentId?: string;
     replies?: any[];
+    removed?: boolean;
   };
   export let articleId: string;
+  export let user: { email: string } | null = null;
 
   const dispatch = createEventDispatcher();
   let showReplyInput = false;
@@ -55,6 +57,30 @@
       loadingReply = false;
     }
   }
+
+  async function removeComment(commentId: string) {
+    loadingReply = true;
+    errorReply = '';
+    try {
+      const res = await fetch(`/api/comments/${commentId}`, {
+        method: 'PATCH',
+        credentials: 'include',
+      });
+      if (!res.ok) {
+        const errorText = await res.text();
+        errorReply = `Failed to remove comment: ${res.status} ${errorText}`;
+        console.error(errorReply, errorText);
+      } else {
+        // bubble up to parent to reload comments
+        dispatch('reply', { removed: true, id: commentId });
+      }
+    } catch (err) {
+      errorReply = 'Error removing comment';
+      console.error('Comment removal error', err);
+    } finally {
+      loadingReply = false;
+    }
+  }
 </script>
 
 <style>
@@ -74,9 +100,12 @@
 <div class="comment-container">
   <div class="comment">
     <strong>{comment.user}</strong>
-    <p>{comment.text}</p>
+    <p>{comment.removed ? 'COMMENT REMOVED BY MODERATOR!' : comment.text}</p>
     <small>{new Date(comment.createdAt).toLocaleString()}</small>
     <button class="reply-btn" on:click={toggleReply}>Reply</button>
+    {#if user && user.email === 'moderator@hw3.com' && !comment.removed}
+      <button class="remove-btn" on:click={() => removeComment(comment.id)}>Delete</button>
+    {/if}
   </div>
 
   {#if showReplyInput}
@@ -84,7 +113,7 @@
       <textarea
         bind:value={replyText}
         placeholder="Write a reply..."
-        on:keydown={(e) =>
+        on:keydown={(e: KeyboardEvent) =>
           e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), submitReply())
         }
         disabled={loadingReply}

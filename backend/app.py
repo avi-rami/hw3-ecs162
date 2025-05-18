@@ -1,7 +1,7 @@
 # app.py
 from dotenv import load_dotenv
 import os
-from flask import Flask, jsonify, send_from_directory, redirect, session, request
+from flask import Flask, jsonify, send_from_directory, redirect, session, request, abort
 import requests
 from flask_cors import CORS
 from pymongo import MongoClient
@@ -73,7 +73,7 @@ def search_articles():
     """Proxy NYT article search through our backend."""
     q = request.args.get("q", "").strip()
     if not q:
-        return jsonify({"error": "Missing ‘q’ parameter"}), 400
+        return jsonify({"error": "Missing 'q' parameter"}), 400
 
     # pull your key from env
     api_key = os.getenv("NYT_API_KEY")
@@ -109,27 +109,12 @@ def add_comment():
 @app.route("/api/comments/<path:article_id>", methods=["GET"])
 def get_comments(article_id):
     """Return all comments for a single article, sorted oldest→newest."""
-    # no ObjectId conversion—just use the raw string key
     docs = list(
         comments.find(
         {"articleId": article_id},
-        {"_id": 1, "user": 1, "text": 1, "createdAt": 1}
+        {"_id": 1, "user": 1, "text": 1, "createdAt": 1, "parentId": 1, "removed": 1}
         ).sort("createdAt", 1)
     )
-
-    # try:
-    #     oid = ObjectId(article_id)
-    # except:
-    #     return jsonify({"error": "Invalid article_id"}), 400
-
-    # docs = list(
-    #     comments.find(
-    #         {"articleId": oid},
-    #         {"_id": 1, "user": 1, "text": 1, "createdAt": 1}
-    #     ).sort("createdAt", 1)
-    # )
-
-    # convert to JSON-serializable
     for d in docs:
         d["id"] = str(d.pop("_id"))
         d["createdAt"] = d["createdAt"].isoformat()
@@ -139,7 +124,7 @@ def get_comments(article_id):
 @app.route("/api/comments/<path:article_id>", methods=["POST"])
 def post_comment(article_id):
     """
-    Body: { text: string }
+    Body: { text: string, parentId?: string }
     Requires authenticated user (session['user']).
     """
     user = session.get("user")
@@ -148,29 +133,43 @@ def post_comment(article_id):
 
     body = request.get_json() or {}
     text = body.get("text", "").strip()
+    parent_id = body.get("parentId")
     if not text:
         return jsonify({"error": "Empty comment"}), 400
 
-    # try:
-    #     oid = ObjectId(article_id)
-    # except:
-    #     return jsonify({"error": "Invalid article_id"}), 400
-
     doc = {
-        # "articleId": oid,
-        # store the raw string ID
         "articleId": article_id,
         "user": user["email"],
         "text": text,
         "createdAt": datetime.utcnow()
     }
+    if parent_id:
+        doc["parentId"] = parent_id
     res = comments.insert_one(doc)
-    return jsonify({
+    response_doc = {
         "id": str(res.inserted_id),
         "user": doc["user"],
         "text": doc["text"],
         "createdAt": doc["createdAt"].isoformat()
-    }), 201
+    }
+    if parent_id:
+        response_doc["parentId"] = parent_id
+    return jsonify(response_doc), 201
+
+# ─── NEW: Remove a comment ─────────────────────────────────────────────────────
+@app.route("/api/comments/<comment_id>", methods=["PATCH"])
+def remove_comment(comment_id):
+    user = session.get("user")
+    if not user or user.get("email") != "moderator@hw3.com":
+        return jsonify({"error": "Moderator access required"}), 403
+    # Update the comment: set text and removed flag
+    result = comments.update_one(
+        {"_id": ObjectId(comment_id)},
+        {"$set": {"text": "COMMENT REMOVED BY MODERATOR!", "removed": True}}
+    )
+    if result.matched_count == 0:
+        return jsonify({"error": "Comment not found"}), 404
+    return jsonify({"success": True})
 
 # ─── AUTH ROUTES ───────────────────────────────────────────────────────────────
 @app.route("/login")

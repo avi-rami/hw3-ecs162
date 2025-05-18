@@ -1,17 +1,21 @@
 <script lang="ts">
   import { createEventDispatcher, onMount } from 'svelte';
+  import CommentThread from './CommentThread.svelte';
   export let articleId: string;
   export let title: string;
+  export let user: { email: string } | null = null;
 
   let comments: Array<{
     id: string;
     user: string;
     text: string;
     createdAt: string;
+    removed: boolean;
   }> = [];
   let newText = '';
   let error = '';
   let loading = false;
+  let threadedComments: any[] = [];
 
   const dispatch = createEventDispatcher();
 
@@ -82,15 +86,59 @@
     dispatch('close');
   }
 
-  function handleKeydown(event){
-      if(event.key === 'Enter' && !event.shiftKey){
-          event.preventDefault();
-          submit();
-      }
+  function handleKeydown(event: KeyboardEvent) {
+    if(event.key === 'Enter' && !event.shiftKey){
+        event.preventDefault();
+        submit();
+    }
   }
+
+  async function removeComment(commentId: string) {
+    loading = true;
+    error = '';
+    try {
+      const res = await fetch(`/api/comments/${commentId}`, {
+        method: 'PATCH',
+        credentials: 'include',
+      });
+      if (!res.ok) {
+        const errorText = await res.text();
+        error = `Failed to remove comment: ${res.status} ${errorText}`;
+        console.error(error, errorText);
+      } else {
+        await loadComments();
+      }
+    } catch (err) {
+      error = 'Error removing comment';
+      console.error('Comment removal error', err);
+    } finally {
+      loading = false;
+    }
+  }
+
+  function buildThread(comments: any[]): any[] {
+    const map = new Map<string, any>();
+    comments.forEach((c: any) => {
+      map.set(c.id, { ...c, replies: [] });
+    });
+    const roots: any[] = [];
+    map.forEach((c: any) => {
+      if (c.parentId) {
+        const parent = map.get(c.parentId);
+        if (parent) parent.replies.push(c);
+        else roots.push(c); // orphaned reply
+      } else {
+        roots.push(c);
+      }
+    });
+    return roots;
+  }
+
   onMount(() => {
       loadComments();
   });
+
+  $: threadedComments = buildThread(comments);
 
 </script>
 
@@ -130,12 +178,8 @@
     <div class="loading">Loading comments...</div>
   {/if}
 
-  {#each comments as c}
-    <div class="comment">
-      <strong>{c.user}</strong>
-      <p>{c.text}</p>
-      <small>{new Date(c.createdAt).toLocaleString()}</small>
-    </div>
+  {#each threadedComments as c}
+    <CommentThread comment={c} articleId={articleId} user={user} on:reply={loadComments} />
   {/each}
 </div>
 
