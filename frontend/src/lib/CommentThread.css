@@ -1,0 +1,92 @@
+.comment-container {
+  margin-bottom: 1rem;
+}
+
+.reply-thread {
+  margin-left: 1.5rem;
+  border-left: 1px solid #ddd;
+  padding-left: 1rem;
+}
+
+.reply-input {
+  margin-top: 0.5rem;
+}
+
+.comment {
+  margin-bottom: 0.5rem;
+  padding-left: 0.5rem;
+}
+
+.comment p {
+  margin: 0.5rem 0;
+}
+
+.comment small {
+  color: #666;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.comment-actions {
+  margin-top: 0.5rem;
+  margin-left: -0.5rem;
+}
+
+.reply-btn, .remove-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  font-weight: bold;
+  cursor: pointer;
+  margin-right: 1rem;
+}
+
+.comment-container .reply-btn {
+  color: #567b94 !important;
+}
+
+.comment-container .remove-btn {
+  color: #718096;
+}
+
+.reply-btn:hover, .remove-btn:hover {
+  opacity: 0.8;
+}
+
+.error {
+  color: #e53e3e;
+  margin: 0.5rem 0;
+}
+
+.btn-group {
+  margin-top: 0.5rem;
+  display: flex;
+  gap: 0.5rem;
+}
+
+textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  resize: vertical;
+}
+
+.submit-btn {
+  background-color: #4a5568;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.submit-btn:hover:not(:disabled) {
+  background-color: #2d3748;
+}
+
+.submit-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+} 

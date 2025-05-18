@@ -1,6 +1,7 @@
 <script lang="ts">
   import { createEventDispatcher } from 'svelte';
-  import CommentThread from './CommentThread.svelte';
+  //import CommentThread from './CommentThread.svelte';
+  import './CommentThread.css';
 
   export let comment: {
     id: string;
@@ -82,20 +83,6 @@
     }
   }
 </script>
-
-<style>
-  .comment-container {
-    margin-bottom: 1rem;
-  }
-  .reply-thread {
-    margin-left: 1.5rem;
-    border-left: 1px solid #ddd;
-    padding-left: 1rem;
-  }
-  .reply-input {
-    margin-top: 0.5rem;
-  }
-</style>
 
 <div class="comment-container">
   <div class="comment">

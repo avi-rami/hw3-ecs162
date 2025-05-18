@@ -24,24 +24,21 @@
       loading = true;
       error = '';
       try {
-          const res = await fetch(
-          `/api/comments/${encodeURIComponent(articleId)}`,
-          { credentials: 'include' }
-      )
+        const res = await fetch(`/api/comments/${encodeURIComponent(articleId)}`,{ credentials: 'include' });
       if (res.ok) {
-          comments = await res.json();
-          // update the parent component with the comment count
-          dispatch('updateCount', { articleId, count: comments.length });
+        comments = await res.json();
+        // update the parent component with the comment count
+        dispatch('updateCount', { articleId, count: comments.length });
       } else {
-          const errorText = await res.text();
-          error = 'Failed to load comments: ${res.status} ${errorText}';
-          console.error(error, errorText);
+        const errorText = await res.text();
+        error = 'Failed to load comments';
+        console.error(error, errorText);
       }
       } catch (err) {
-          error = 'Failed to load comments';
-          console.error('Comment loading error', err);
+        error = 'Failed to load comments';
+        console.error('Comment loading error', err);
       } finally {
-          loading = false;
+        loading = false;
       }
   }
 
@@ -51,8 +48,7 @@
     error = ''
     loading = true;
     try {
-      const res = await fetch(
-        `/api/comments/${encodeURIComponent(articleId)}`,
+      const res = await fetch(`/api/comments/${encodeURIComponent(articleId)}`,
         {
           method: 'POST',
           credentials: 'include',
@@ -67,7 +63,7 @@
         dispatch('updateCount', { articleId, count: comments.length });
       } else {
         const errorText = await res.text();
-        error = 'Failed to post comment: ${res.status} ${errorText}';
+        error = 'Failed to post comment';
         console.error(error, errorText);
       }
     } catch (err) {
@@ -103,7 +99,7 @@
       });
       if (!res.ok) {
         const errorText = await res.text();
-        error = `Failed to remove comment: ${res.status} ${errorText}`;
+        error = `Failed to remove comment`;
         console.error(error, errorText);
       } else {
         await loadComments();
@@ -144,9 +140,13 @@
 
 <aside class="comments-sidebar">
   <header>
-    <h2>Comments ({comments.length})</h2>
+    <div class="article-title">{title}</div>
     <button class="close-btn" on:click={close}>✕</button>
   </header>
+
+  <div class="comments-header">
+    <h2>Comments ({comments.length})</h2>
+  </div>
 
   <div class="sidebar-content">
     <div class="input-section">
@@ -228,10 +228,70 @@
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     font-style: italic;
   }
-</style>
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #eee;
+  }
 
+  .article-title {
+    font-size: 1.2rem;
+    color: #333;
+    flex: 1;
+    margin-right: 1rem;
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+
+  .close-btn {
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    cursor: pointer;
+    padding: 0;
+    color: #666;
+  }
+
+  .close-btn:hover {
+    opacity: 0.7;
+  }
+
+  .comments-header {
+    padding: 0.5rem 1rem 0.25rem 1rem;
+  }
+
+  .comments-header h2 {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin: 0;
+    color: #333;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+
+  .comment-count {
+    font-size: 1.25rem;
+    color: #666;
+    margin-left: 0.5rem;
+    font-weight: normal;
+  }
+
+  .input-section {
+    padding: 0.25rem 1rem;
+  }
+
+  .sidebar-content {
+    padding-top: 0;
+  }
+</style>
 <footer>
   <button class="logout-btn" on:click={() => (location.href = '/logout')}>
     Log out
   </button>
 </footer>
+
