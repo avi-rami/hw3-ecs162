@@ -142,49 +142,96 @@
 
 </script>
 
-<aside class="account-sidebar comments-sidebar">
+<aside class="comments-sidebar">
   <header>
-    <h2>{title}</h2>
+    <h2>Comments ({comments.length})</h2>
     <button class="close-btn" on:click={close}>✕</button>
   </header>
 
   <div class="sidebar-content">
+    <div class="input-section">
       {#if error}
-      <div class="error">{error} </div>
+        <div class="error">{error}</div>
       {/if}
-  
-    <label for="new-comment">Comments ({comments.length})</label>
-    <input
-      id="new-comment"
-      type="text"
-      placeholder="Share your thoughts."
-      bind:value={newText}
-      on:keydown={handleKeydown}
-      disabled={loading}
-    />
-  
-  <div class="btn-group">
-    <button on:click={cancel} disabled={loading || !newText}>Cancel</button>
-    <button 
-      on:click={submit} 
-      disabled={loading || !newText.trim()} 
-      class="submit-btn"
-    >
-      {loading ? 'Posting...' : 'Submit'}
-    </button>
+
+      {#if user}
+        <input
+          id="new-comment"
+          type="text"
+          placeholder="Share your thoughts."
+          bind:value={newText}
+          on:keydown={handleKeydown}
+          disabled={loading}
+        />
+
+        <div class="btn-group">
+          <button on:click={cancel} disabled={loading || !newText}>
+            Cancel
+          </button>
+          <button 
+            class="submit-btn"
+            on:click={submit} 
+            disabled={loading || !newText.trim()}
+          >
+            {loading ? 'Posting...' : 'Submit'}
+          </button>
+        </div>
+      {:else}
+        <p class="login-prompt">
+          Please <a href="/login">log in</a> to leave a comment.
+        </p>
+      {/if}
+    </div>
+
+    <div class="comments-section">
+      {#if loading && comments.length === 0}
+        <div class="loading">Loading comments...</div>
+      {/if}
+
+      {#each threadedComments as comment (comment.id)}
+        <CommentThread 
+          {comment}
+          {articleId}
+          {user}
+          on:reply={loadComments}
+        />
+      {/each}
+
+      {#if comments.length === 0 && !loading}
+        <div class="no-comments">
+          No comments yet. Be the first to share your thoughts!
+        </div>
+      {/if}
+    </div>
   </div>
+</aside>
 
-  {#if loading && comments.length === 0}
-    <div class="loading">Loading comments...</div>
-  {/if}
-
-  {#each threadedComments as c}
-    <CommentThread comment={c} articleId={articleId} user={user} on:reply={loadComments} />
-  {/each}
-</div>
+<style>
+  .login-prompt {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  .login-prompt a {
+    color: #000;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .login-prompt a:hover {
+    text-decoration: underline;
+  }
+  .no-comments {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-style: italic;
+  }
+</style>
 
 <footer>
   <button class="logout-btn" on:click={() => (location.href = '/logout')}>
     Log out
   </button>
-</footer></aside>
+</footer>

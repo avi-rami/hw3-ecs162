@@ -133,10 +133,9 @@
       Log In
     </button>
   {:else}
-    <!-- fix: actually *call* openAccount() -->
     <button class="login-button"
             on:click={openAccount}>
-      Account ▾
+      Account
     </button>
   {/if}
 </header>

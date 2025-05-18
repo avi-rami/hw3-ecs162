@@ -100,12 +100,20 @@
 <div class="comment-container">
   <div class="comment">
     <strong>{comment.user}</strong>
-    <p>{comment.removed ? 'COMMENT REMOVED BY MODERATOR!' : comment.text}</p>
+    <p>{comment.removed ? 'Comment was removed by moderator' : comment.text}</p>
     <small>{new Date(comment.createdAt).toLocaleString()}</small>
-    <button class="reply-btn" on:click={toggleReply}>Reply</button>
-    {#if user && user.email === 'moderator@hw3.com' && !comment.removed}
-      <button class="remove-btn" on:click={() => removeComment(comment.id)}>Delete</button>
-    {/if}
+    <div class="comment-actions">
+      {#if !comment.removed}
+        <button class="reply-btn" on:click={toggleReply}>
+          Reply
+        </button>
+        {#if user && user.email === 'moderator@hw3.com'}
+          <button class="remove-btn" on:click={() => removeComment(comment.id)}>
+            Delete
+          </button>
+        {/if}
+      {/if}
+    </div>
   </div>
 
   {#if showReplyInput}
@@ -113,9 +121,12 @@
       <textarea
         bind:value={replyText}
         placeholder="Write a reply..."
-        on:keydown={(e: KeyboardEvent) =>
-          e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), submitReply())
-        }
+        on:keydown={(e) => {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            submitReply();
+          }
+        }}
         disabled={loadingReply}
       />
       {#if errorReply}
@@ -125,7 +136,11 @@
         <button on:click={toggleReply} disabled={loadingReply}>
           Cancel
         </button>
-        <button on:click={submitReply} disabled={!replyText.trim() || loadingReply}>
+        <button 
+          class="submit-btn"
+          on:click={submitReply} 
+          disabled={!replyText.trim() || loadingReply}
+        >
           {loadingReply ? 'Posting...' : 'Submit'}
         </button>
       </div>
@@ -135,10 +150,10 @@
   {#if comment.replies?.length}
     <div class="reply-thread">
       {#each comment.replies as reply (reply.id)}
-        <!-- re-dispatch any nested reply events upward -->
-        <CommentThread
+        <svelte:self
           {articleId}
           comment={reply}
+          {user}
           on:reply={(e) => dispatch('reply', e.detail)}
         />
       {/each}
