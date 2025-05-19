@@ -1,10 +1,12 @@
 <script lang="ts">
   import { createEventDispatcher, onMount } from 'svelte';
   import CommentThread from './CommentThread.svelte';
+  import './CommentsSidebar.css';
   export let articleId: string;
   export let title: string;
   export let user: { email: string } | null = null;
 
+  // comments state
   let comments: Array<{
     id: string;
     user: string;
@@ -82,6 +84,7 @@
     dispatch('close');
   }
 
+  // handle keyboard shortcuts for comment submission
   function handleKeydown(event: KeyboardEvent) {
     if(event.key === 'Enter' && !event.shiftKey){
         event.preventDefault();
@@ -89,29 +92,7 @@
     }
   }
 
-  async function removeComment(commentId: string) {
-    loading = true;
-    error = '';
-    try {
-      const res = await fetch(`/api/comments/${commentId}`, {
-        method: 'PATCH',
-        credentials: 'include',
-      });
-      if (!res.ok) {
-        const errorText = await res.text();
-        error = `Failed to remove comment`;
-        console.error(error, errorText);
-      } else {
-        await loadComments();
-      }
-    } catch (err) {
-      error = 'Error removing comment';
-      console.error('Comment removal error', err);
-    } finally {
-      loading = false;
-    }
-  }
-
+  // organize comments into a threaded structure for nested display
   function buildThread(comments: any[]): any[] {
     const map = new Map<string, any>();
     comments.forEach((c: any) => {
@@ -122,7 +103,7 @@
       if (c.parentId) {
         const parent = map.get(c.parentId);
         if (parent) parent.replies.push(c);
-        else roots.push(c); // orphaned reply
+        else roots.push(c); // no parent but still a comment
       } else {
         roots.push(c);
       }
@@ -134,26 +115,32 @@
       loadComments();
   });
 
+  // update threads when comments change
   $: threadedComments = buildThread(comments);
 
 </script>
 
+<!-- main sidebar for comments -->
 <aside class="comments-sidebar">
+  <!-- article title up top with a close button -->
   <header>
     <div class="article-title">{title}</div>
     <button class="close-btn" on:click={close}>✕</button>
   </header>
 
+  <!-- comments counter -->
   <div class="comments-header">
     <h2>Comments ({comments.length})</h2>
   </div>
 
   <div class="sidebar-content">
+    <!-- input section for comments -->
     <div class="input-section">
       {#if error}
         <div class="error">{error}</div>
       {/if}
 
+      <!-- if logged in, show the comment box, otherwise ask them to login -->
       {#if user}
         <input
           id="new-comment"
@@ -164,6 +151,7 @@
           disabled={loading}
         />
 
+        <!-- submit and cancel button -->
         <div class="btn-group">
           <button on:click={cancel} disabled={loading || !newText}>
             Cancel
@@ -183,11 +171,13 @@
       {/if}
     </div>
 
+    <!-- comment display -->
     <div class="comments-section">
       {#if loading && comments.length === 0}
         <div class="loading">Loading comments...</div>
       {/if}
 
+      <!-- loop through and show all comments in a threaded view -->
       {#each threadedComments as comment (comment.id)}
         <CommentThread 
           {comment}
@@ -197,6 +187,7 @@
         />
       {/each}
 
+      <!-- show message if theres no comments -->
       {#if comments.length === 0 && !loading}
         <div class="no-comments">
           No comments yet. Be the first to share your thoughts!
@@ -206,92 +197,9 @@
   </div>
 </aside>
 
-<style>
-  .login-prompt {
-    text-align: center;
-    padding: 2rem;
-    color: #666;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  }
-  .login-prompt a {
-    color: #000;
-    text-decoration: none;
-    font-weight: 500;
-  }
-  .login-prompt a:hover {
-    text-decoration: underline;
-  }
-  .no-comments {
-    text-align: center;
-    padding: 2rem;
-    color: #666;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    font-style: italic;
-  }
-  header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid #eee;
-  }
-
-  .article-title {
-    font-size: 1.2rem;
-    color: #333;
-    flex: 1;
-    margin-right: 1rem;
-    font-weight: bold;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  }
-
-  .close-btn {
-    background: none;
-    border: none;
-    font-size: 1.25rem;
-    cursor: pointer;
-    padding: 0;
-    color: #666;
-  }
-
-  .close-btn:hover {
-    opacity: 0.7;
-  }
-
-  .comments-header {
-    padding: 0.5rem 1rem 0.25rem 1rem;
-  }
-
-  .comments-header h2 {
-    font-size: 1.2rem;
-    font-weight: bold;
-    margin: 0;
-    color: #333;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  }
-
-  .comment-count {
-    font-size: 1.25rem;
-    color: #666;
-    margin-left: 0.5rem;
-    font-weight: normal;
-  }
-
-  .input-section {
-    padding: 0.25rem 1rem;
-  }
-
-  .sidebar-content {
-    padding-top: 0;
-  }
-</style>
+<!-- logout button at the bottom -->
 <footer>
   <button class="logout-btn" on:click={() => (location.href = '/logout')}>
     Log out
   </button>
 </footer>
-

@@ -172,19 +172,15 @@ def remove_comment(comment_id):
 def login():
     session["nonce"] = nonce
     redirect_uri = "http://localhost:8000/authorize"
-    # return oauth.flask_app.authorize_redirect(redirect_uri, nonce=nonce)
     client = oauth.create_client(os.getenv("OIDC_CLIENT_NAME"))
     return client.authorize_redirect(redirect_uri, nonce=nonce)
 # authorizing the user to access the app
 @app.route("/authorize")
 def authorize():
-    # token = oauth.flask_app.authorize_access_token()
-    # user_info = oauth.flask_app.parse_id_token(token, nonce=session.get("nonce"))
     client = oauth.create_client(os.getenv("OIDC_CLIENT_NAME"))
     token = client.authorize_access_token()
     user_info = client.parse_id_token(token, nonce=session.get("nonce"))
     session["user"] = user_info
-    # return redirect("/")
     return redirect("http://localhost:5173/")
 # logging out the user
 @app.route("/logout")
