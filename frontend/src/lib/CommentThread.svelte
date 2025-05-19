@@ -94,7 +94,9 @@
   <!-- the actual comment content -->
   <div class="comment">
     <strong>{comment.user}</strong>
-    <p>{comment.removed ? 'Comment was removed by moderator' : comment.text}</p>
+    <p class={comment.removed ? 'removed-comment' : ''}>
+      {comment.removed ? 'Comment Was Removed By Moderator!' : comment.text}
+    </p>
     <small>{new Date(comment.createdAt).toLocaleString()}</small>
     <div class="comment-actions">
       {#if !comment.removed}

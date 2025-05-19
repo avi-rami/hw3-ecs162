@@ -53,6 +53,10 @@
   opacity: 0.8;
 }
 
+.removed-comment {
+  color: #bbb !important;
+}
+
 .error {
   color: #e53e3e;
   margin: 0.5rem 0;
