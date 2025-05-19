@@ -2,9 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, fireEvent, waitFor } from '@testing-library/svelte/svelte5';
 import CommentsSidebar from '../lib/CommentsSidebar.svelte';
 
-/**
- * Types for our test data
- */
+// test data types
 interface Comment {
   id: string;
   user: string;
