@@ -59,4 +59,30 @@ Create a `.env` file based on `.env.example` with the following variables:
 
 ## License
 
-This project is part of ECS 162 coursework. 
+This project is part of ECS 162 coursework.
+
+# NYT Homepage Recreation
+
+This project recreates the New York Times homepage using modern web technologies. It includes a frontend built with Svelte and a backend API.
+
+## Features
+- Responsive design mimicking the NYT homepage layout
+- Real-time news updates
+- User authentication and comments system
+
+## Getting Started
+1. Clone the repository
+2. Install dependencies:
+   - Frontend: `cd frontend && npm install`
+   - Backend: `cd backend && npm install`
+3. Start the development server:
+   - Frontend: `npm run dev`
+   - Backend: `npm run dev`
+
+## Technologies Used
+- Frontend: Svelte, Vite
+- Backend: Node.js, Express
+- Database: MongoDB
+
+## License
+MIT 
