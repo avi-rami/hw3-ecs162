@@ -1,5 +1,3 @@
-Here’s a streamlined version that merges both parts and removes duplicates:
-
 # NYT Homepage Recreation
 
 A containerized web app that recreates the New York Times homepage with real-time news, user authentication, and comments.
@@ -27,10 +25,9 @@ A containerized web app that recreates the New York Times homepage with real-tim
 ## Getting Started
 
 1. **Clone**  
-   ```bash
+
    git clone [your-repo-url]
    cd [repo-name]
-````
 
 2. **Dev mode**
 
