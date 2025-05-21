@@ -1,6 +1,6 @@
-# ECS 162 Homework 3 - Web Application
+# Web Application
 
-This is a web application built for ECS 162 Homework 3. The application consists of a frontend and backend service, containerized using Docker.
+This is a web application built for a project. The application consists of a frontend and backend service, containerized using Docker.
 
 ## Project Structure
 
@@ -59,7 +59,7 @@ Create a `.env` file based on `.env.example` with the following variables:
 
 ## License
 
-This project is part of ECS 162 coursework.
+This project is licensed under the MIT License.
 
 # NYT Homepage Recreation
 
