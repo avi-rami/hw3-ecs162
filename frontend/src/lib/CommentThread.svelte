@@ -3,6 +3,7 @@
   //import CommentThread from './CommentThread.svelte';
   import './CommentThread.css';
 
+  // comment info
   export let comment: {
     id: string;
     user: string;
@@ -15,18 +16,21 @@
   export let articleId: string;
   export let user: { email: string } | null = null;
 
+  // handles replies
   const dispatch = createEventDispatcher();
   let showReplyInput = false;
   let replyText = '';
   let loadingReply = false;
   let errorReply = '';
 
+  // show/hide the reply box
   function toggleReply() {
     showReplyInput = !showReplyInput;
     replyText = '';
     errorReply = '';
   }
 
+  // handle posting a new reply
   async function submitReply() {
     if (!replyText.trim()) return;
     loadingReply = true;
@@ -48,7 +52,7 @@
         throw new Error(errTxt);
       }
       const newComment = await res.json();
-      // bubble up to the sidebar
+      // notify parent of new reply
       dispatch('reply', newComment);
       showReplyInput = false;
     } catch (err) {
@@ -59,6 +63,7 @@
     }
   }
 
+  // delete a comment (only mods can do this)
   async function removeComment(commentId: string) {
     loadingReply = true;
     errorReply = '';
@@ -72,7 +77,7 @@
         errorReply = `Failed to remove comment: ${res.status} ${errorText}`;
         console.error(errorReply, errorText);
       } else {
-        // bubble up to parent to reload comments
+        // notify parent of removal
         dispatch('reply', { removed: true, id: commentId });
       }
     } catch (err) {
@@ -84,16 +89,21 @@
   }
 </script>
 
+<!-- comment threads -->
 <div class="comment-container">
+  <!-- the actual comment content -->
   <div class="comment">
     <strong>{comment.user}</strong>
-    <p>{comment.removed ? 'Comment was removed by moderator' : comment.text}</p>
+    <p class={comment.removed ? 'removed-comment' : ''}>
+      {comment.removed ? 'Comment Was Removed By Moderator!' : comment.text}
+    </p>
     <small>{new Date(comment.createdAt).toLocaleString()}</small>
     <div class="comment-actions">
       {#if !comment.removed}
         <button class="reply-btn" on:click={toggleReply}>
           Reply
         </button>
+        <!-- only mods can delete comments -->
         {#if user && user.email === 'moderator@hw3.com'}
           <button class="remove-btn" on:click={() => removeComment(comment.id)}>
             Delete
@@ -103,6 +113,7 @@
     </div>
   </div>
 
+  <!-- reply box shows up button is clicked-->
   {#if showReplyInput}
     <div class="reply-input">
       <textarea
@@ -134,8 +145,10 @@
     </div>
   {/if}
 
+  <!-- nested replies -->
   {#if comment.replies?.length}
     <div class="reply-thread">
+      <!-- loop through and show all replies -->
       {#each comment.replies as reply (reply.id)}
         <svelte:self
           {articleId}

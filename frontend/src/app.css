@@ -1,4 +1,4 @@
-/* BASE STYLES + BP */
+/* BASE STYLES + BREAKPOINTS */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 html { background-color: #ffffff; }
 body {
@@ -14,7 +14,7 @@ body {
     body { padding: 0 25px; }
 }
 
-/* TYPOGRAPHY FOR THE NYT STYLING */
+/* NYT STYLING FOR HEADLINES AND BODY TEXT */
 h1, h2, h3 {
     font-family: Georgia, serif;
     font-weight: bold;
@@ -30,7 +30,7 @@ p {
     font-family: Georgia, serif;
 }
 
-/* HEADER STYLING */
+/* HEADER */
 header {
     display: flex;
     justify-content: space-between;
@@ -50,7 +50,7 @@ header {
 .sub-date { font-size: 0.85rem; color: #666; }
 .logo { max-width: 400px; height: auto; margin: 0 auto; display: block; }
 
-/* LAYOUT FOR THE MAIN CONTENT */
+/* MAIN CONTENT */
 main {
     display: flex;
     flex-wrap: wrap;
@@ -66,7 +66,7 @@ main {
 }
 
 
-/* ARTICLE STYLING AND IMAGE*/
+/* ARTICLE & IMAGE STYLING */
 article { margin-bottom: 20px; }
 article img {
     width: 100%;
@@ -89,9 +89,7 @@ article img {
 footer { padding: 20px 0; color: #666; font-size: 0.9rem; font-family: Arial, sans-serif; text-align: center; }
 .footer-divider { border-bottom: 3px solid #000; margin: 10px auto 15px; width: 90%; }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   Sidebar container: fixed to the right, full height, off-canvas by default
-───────────────────────────────────────────────────────────────────────────── */
+/* SIDEBAR CONTAINER */
 .account-sidebar {
     position: fixed;
     top: 0;
@@ -136,7 +134,7 @@ footer { padding: 20px 0; color: #666; font-size: 0.9rem; font-family: Arial, sa
     margin-bottom: 0;
 }
 
-/* Close "X" button in the header */
+/* X BUTTON */
 .account-sidebar .close-btn {
     margin-left: auto;
     background: transparent;
@@ -145,13 +143,13 @@ footer { padding: 20px 0; color: #666; font-size: 0.9rem; font-family: Arial, sa
     cursor: pointer;
 }
 
-/* Footer sticks to bottom */
+/* footer sticks to bottom */
 .account-sidebar footer {
     margin-top: auto;
     text-align: center;
 }
 
-/* Log Out button styling */
+/* LOG OUT BUTTON */
 .account-sidebar .logout-btn {
     background: none;
     border: none;
@@ -160,6 +158,7 @@ footer { padding: 20px 0; color: #666; font-size: 0.9rem; font-family: Arial, sa
     cursor: pointer;
 }
 
+/* COMMENTS SIDEBAR */
 .comments-sidebar {
     position: fixed;
     top: 0;
@@ -175,6 +174,7 @@ footer { padding: 20px 0; color: #666; font-size: 0.9rem; font-family: Arial, sa
     overflow: hidden;
 }
 
+/* COMMENTS SIDEBAR HEADER */
 .comments-sidebar header {
     flex-shrink: 0;
     padding: 0.75rem 1rem;
@@ -184,12 +184,14 @@ footer { padding: 20px 0; color: #666; font-size: 0.9rem; font-family: Arial, sa
     align-items: center;
 }
 
+/* HEADER TITLE */
 .comments-sidebar header h2 {
     font-size: 1.25rem;
     margin: 0;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
+/* CLOSE BUTTON */
 .comments-sidebar .close-btn {
     background: none;
     border: none;
@@ -203,6 +205,7 @@ footer { padding: 20px 0; color: #666; font-size: 0.9rem; font-family: Arial, sa
     color: #333;
 }
 
+/* MAIN CONTENT CONTAINER */
 .comments-sidebar .sidebar-content {
     flex: 1;
     min-height: 0;
@@ -223,6 +226,7 @@ footer { padding: 20px 0; color: #666; font-size: 0.9rem; font-family: Arial, sa
     -webkit-overflow-scrolling: touch;
 }
 
+/* TEXT INPUT FIELD */
 .comments-sidebar input[type="text"] {
     width: 100%;
     padding: 0.75rem;
@@ -246,6 +250,7 @@ footer { padding: 20px 0; color: #666; font-size: 0.9rem; font-family: Arial, sa
     margin: 0.5rem 0 1rem 0;
 }
 
+/* BUTTON STYLES */
 .comments-sidebar .btn-group button {
     padding: 0.5rem 0.75rem;
     border: 1px solid #e2e2e2;
@@ -285,6 +290,7 @@ footer { padding: 20px 0; color: #666; font-size: 0.9rem; font-family: Arial, sa
     border-bottom: none;
 }
 
+/* COMMENT USERNAME */
 .comments-sidebar .comment strong {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     font-size: 0.875rem;
@@ -293,6 +299,7 @@ footer { padding: 20px 0; color: #666; font-size: 0.9rem; font-family: Arial, sa
     margin-bottom: 0.5rem;
 }
 
+/* COMMENT TEXT */
 .comments-sidebar .comment p {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     font-size: 0.9375rem;
@@ -309,6 +316,7 @@ footer { padding: 20px 0; color: #666; font-size: 0.9rem; font-family: Arial, sa
     margin-top: 0.5rem;
 }
 
+/* COMMENT ACTION BUTTONS */
 .comments-sidebar .comment .reply-btn,
 .comments-sidebar .comment .remove-btn {
     background: none;
@@ -328,12 +336,14 @@ footer { padding: 20px 0; color: #666; font-size: 0.9rem; font-family: Arial, sa
     border-radius: 4px;
 }
 
+/* NESTED REPLIES CONTAINER */
 .comments-sidebar .reply-thread {
     margin-left: 2rem;
     padding-left: 1rem;
     border-left: 2px solid #eee;
 }
 
+/* REPLY INPUT CONTAINER */
 .comments-sidebar .reply-input {
     margin: 1rem 0;
 }
@@ -364,6 +374,7 @@ footer { padding: 20px 0; color: #666; font-size: 0.9rem; font-family: Arial, sa
     display: block;
 }
 
+/* ERROR MESSAGE */
 .comments-sidebar .error {
     background: #fff2f2;
     color: #d32f2f;
@@ -374,6 +385,7 @@ footer { padding: 20px 0; color: #666; font-size: 0.9rem; font-family: Arial, sa
     margin: 1rem 0;
 }
 
+/* LOADING STATE */
 .comments-sidebar .loading {
     text-align: center;
     padding: 2rem;

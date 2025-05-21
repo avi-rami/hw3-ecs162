@@ -14,7 +14,6 @@
   // which article to show comments for
   let currentArticle = { id: '', title: '' }
 
-  /** Fired when CommentsSidebar dispatches `updateCount` */
   function handleUpdateCount(event) {
     const { articleId, count } = event.detail;
     // immutably update only that one article's commentCount
@@ -23,7 +22,7 @@
     );
   }
 
-    /** after we load articles, also load their comment counts */
+    // load comments after articles load
   async function loadCommentCounts() {
     // fire off one GET /api/comments/:id per article
     const counts = await Promise.all(
